@@ -1,0 +1,1 @@
+HELLO FROM ASYNC FILE and writeFile
