@@ -12,7 +12,6 @@ const isTokenValid = (req, res, next) => {
     if (!decodeToken) {
       return res.json({ success: false, msg: "invalid token" });
     }
-
     req.userId = decodeToken;
     next();
   } catch (error) {

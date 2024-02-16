@@ -1,0 +1,56 @@
+import Conversation from "../model/conversation.model.js";
+import Message from "../model/message.modal.js";
+
+const SentMessage = async (req, res) => {
+  try {
+    const { message } = req.body;
+    const { receiverId } = req.params;
+    const senderId = req.userId.userId;
+    console.log(receiverId, senderId);
+    
+    let conversation = await Conversation.findOne({
+      participants: { $all: [senderId, receiverId] },
+    });
+    console.log(conversation);
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [senderId, receiverId],
+      });
+    }
+
+    console.log(conversation);
+    console.log("message = ", message);
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      message,
+    });
+    console.log("newmessage = ", newMessage);
+    if (message) {
+      conversation.messages.push(newMessage._id);
+    }
+
+    await Promise.all([newMessage.save(), conversation.save()]);
+    return res.json(newMessage);
+  } catch (error) {
+    res.json({ err: error.message });
+  }
+};
+
+const getMessage = async (req, res) => {
+  try {
+    const { receiverId } = req.params;
+    const senderUserId = req.userId.userId;
+
+    const coversation = await Conversation.findOne({
+      participants: { $all: [senderUserId, receiverId] },
+    }).populate("messages");
+
+    return res.json(coversation);
+  } catch (error) {
+    return res.json(error.message);
+  }
+};
+
+export { SentMessage, getMessage };

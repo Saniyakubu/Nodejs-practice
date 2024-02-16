@@ -18,4 +18,4 @@ const personModel = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("person", personModel);
+export default mongoose.model("Person", personModel);
