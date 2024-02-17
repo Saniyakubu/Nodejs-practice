@@ -10,6 +10,39 @@
       <section>
         <h1>Socket io Chat App</h1>
       </section>
+      <section>
+        <form id="messageForm">
+          <input type="text" id="messageInput" />
+          <button type="submit">send</button>
+        </form>
+        <ul id="listItem"></ul>
+      </section>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+      const socket = io("http://localhost:2000");
+      const messageInput = document.getElementById("messageInput");
+      const messageForm = document.getElementById("messageForm");
+
+      messageForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        socket.emit("message", messageInput.value);
+      });
+
+      socket.on("message", (message) => {
+        const ul = document.getElementById("listItem");
+        const li = document.createElement("li");
+        li.textContent = message;
+        ul.appendChild(li);
+      });
+
+      socket.on("disconnect", (disconnect) => {
+        console.log(disconnect);
+        const ul = document.getElementById("listItem");
+        const li = document.createElement("li");
+        li.textContent = disconnect;
+        ul.appendChild(li);
+      });
+    </script>
   </body>
 </html>
