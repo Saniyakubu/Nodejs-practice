@@ -17,19 +17,21 @@
         </form>
         <ul id="listItem"></ul>
       </section>
+      <p id="user"></p>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module">
-      const socket = io("http://localhost:2000");
+      const socket = io();
       const messageInput = document.getElementById("messageInput");
       const messageForm = document.getElementById("messageForm");
-
+      const userActivity = document.getElementById("user");
       messageForm.addEventListener("submit", (e) => {
         e.preventDefault();
         socket.emit("message", messageInput.value);
       });
 
       socket.on("message", (message) => {
+        userActivity.textContent = "";
         const ul = document.getElementById("listItem");
         const li = document.createElement("li");
         li.textContent = message;
@@ -42,6 +44,21 @@
         const li = document.createElement("li");
         li.textContent = disconnect;
         ul.appendChild(li);
+      });
+
+      messageInput.addEventListener("keypress", () => {
+        socket.emit("activity", socket.id);
+      });
+
+      let activityTimer;
+      socket.on("activity", (userId) => {
+        console.log(userId);
+
+        userActivity.textContent = userId;
+        clearTimeout(activityTimer);
+        activityTimer = setTimeout(() => {
+          userActivity.textContent = "";
+        }, 2000);
       });
     </script>
   </body>

@@ -17,14 +17,21 @@ const io = new Server(expressServer);
 App.use(express.static("public"));
 
 io.on("connection", (client) => {
-  console.log("io user is connected");
+  client.emit("message", "welcome to chat");
+
+  client.broadcast.emit("message", `${client.id} just joined`);
+
   client.on("message", (message) => {
-    console.log(message);
     io.emit("message", `${client.id}: ${message}`);
   });
 
+  client.on("activity", (userId) => {
+    console.log(userId);
+    client.broadcast.emit("activity", `${userId} is typing...`);
+  });
+
   client.on("disconnect", () => {
-    io.emit("out", " user disconnected");
+    client.broadcast.emit("message", `${client.id} just left the chat`);
   });
 });
 
